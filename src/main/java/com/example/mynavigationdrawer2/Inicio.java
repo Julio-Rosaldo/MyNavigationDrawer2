@@ -24,6 +24,8 @@ public class Inicio extends AppCompatActivity {
         editor.putBoolean("sesion", true);
         editor.commit();
 
+        int doge = 11;
+
         Intent intent = new Intent(this, MainActivity.class);
         //String user = "julio";
         //intent.putExtra("user", user);
