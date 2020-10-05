@@ -1,13 +1,19 @@
 package com.example.mynavigationdrawer2;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -28,6 +34,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences preferencias = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
+        boolean Sesion = preferencias.getBoolean("sesion", false);
+        /*
+        if(!Sesion){
+            Intent intent = new Intent(this, Inicio.class);
+            startActivity(intent);
+            finish();
+        }
+
+         */
+        //String user = getIntent().getStringExtra("user");
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -45,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.myTabbedFragment)
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.myTabbedFragment, R.id.exitFragment)
                 .setDrawerLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -65,5 +84,48 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setMessage("¿Esta seguro que desea salir?");
+        builder.setTitle("Cerrar sesion");
+
+        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Toast.makeText(MainActivity.this, "Operacion exitosa", Toast.LENGTH_LONG).show();
+
+                SharedPreferences preferencias = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferencias.edit();
+                //editor.putString("usuario", TxtUsuario.getText().toString());
+                //editor.putString("contrasena", TxtContrasena.getText().toString());
+                editor.putBoolean("sesion", false);
+                editor.commit();
+
+                Intent intent = new Intent(MainActivity.this, Inicio.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // Do nothing
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+
+        Intent intent = new Intent(MainActivity.this, Inicio.class);
+        startActivity(intent);
+        finish();
     }
 }
